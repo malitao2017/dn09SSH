@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-2.5.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+	<!-- jdbc连接集 -->
+	<bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql://localhost:3306/test"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="root"></property>
+		<property name="maxActive" value="10"></property>
+		<property name="initialSize" value="2"></property>
+	</bean>
+	<!-- haibernate的sesionFactory结果集 -->
+	<bean id="mySessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource" ref="myDataSource"></property>
+		<property name="mappingResources">
+			<list>
+				<value>mapping/User.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>     
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+			</props>
+		</property>
+	</bean>
+<!-- 	hibernate的数据库访问模式 -->
+<!-- 	<bean id="userDao" class="dao.impl.HibernateUserDAOImpl"> -->
+<!-- 		<property name="sessionFactory" ref="mySessionFactory"></property> -->
+<!-- 	</bean> -->
+
+<!-- 	jdbc的数据库访问模式 -->
+	<bean id="userDao" class="dao.impl.JDBCUserDAOImpl">
+		<property name="dataSource" ref="myDataSource"></property>
+	</bean>
+	
+	<bean id="userService" class="service.impl.UserServiceImpl">
+		<property name="userDao" ref="userDao"></property>
+	</bean>
+	
+	<!-- 第二种ssh整合方案：struts的action类交由spring管理 -->
+	<bean id="loginAction" class="action.LoginAction">
+		<property name="userService" ref="userService"></property>
+	</bean>
+	
+	<!-- 事务处理有编程式的 -->
+	<!-- 使用声明配置式 -->
+<!-- 	hibernate的访问模式 -->
+<!-- 	<bean id="txManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager"> -->
+<!-- 		<property name="sessionFactory" ref="mySessionFactory"></property> -->
+<!-- 	</bean> -->
+<!-- 	jdbc的访问模式 -->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="myDataSource"></property>
+	</bean>
+	
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="save*" propagation="REQUIRED"/>
+			<tx:method name="update*" propagation="REQUIRED"/>
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="find*" propagation="NOT_SUPPORTED" read-only="true"/>
+			<tx:method name="*" propagation="REQUIRED"/>
+		</tx:attributes>
+	</tx:advice>
+
+	<aop:config>
+		<aop:pointcut expression="within(service..*)" id="txPoint"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPoint"/>
+	</aop:config>
+
+</beans>
+

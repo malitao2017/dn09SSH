@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+"-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+"http://struts.apache.org/dtds/struts-2.1.7.dtd">
+
+<struts>
+	<package name="ssh1-demo" extends="struts-default">
+<!-- 	第一种ssh整合方案 :由struts2进行管理-->
+<!-- 		<action name="login" class="action.LoginAction"> -->
+<!--    第二种ssh整合方案：交由spring管理 -->
+		<action name="login" class="loginAction">
+			<result name="success">/success.jsp</result>
+			<result name="login">/login.jsp</result>
+		</action>
+	</package>
+	
+	<!-- Struts2交由spring管理后需要修改的对象的装载方式的配置参数 -->
+	<constant name="struts.objectFactory.spring.autoWire" value="type"></constant>
+	
+</struts>

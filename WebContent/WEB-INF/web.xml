@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>dn09SSH</display-name>
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>login.jsp</welcome-file>
+  </welcome-file-list>
+  <!-- spring所需要的全局参数 -->
+  <context-param>
+  	<param-name>contextConfigLocation</param-name>
+  	<param-value>classpath:ssh.xml</param-value>
+  </context-param>
+  
+  <!-- spring起作用的监听器 -->
+  <listener>
+  	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  
+  <!-- 实现Struts2交由spring管理的关键是加入jar包 struts2-spring-plugin-2.1.8.1.jar 
+  		这样就可以实现过滤器的struts2可以自动配置，
+  		核心是其中的 struts-plugin.xml 中的 <constant name="struts.objectFactory" value="spring" /> -->
+  
+  <!-- 过滤器必须在监听器之后 servlet之前 -->
+  <!-- Struts2使用的技术是基于过滤器的拦截器 -->
+  <filter>
+  	<filter-name>struts2</filter-name>
+  	<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+  </filter>
+  <filter-mapping>
+  	<filter-name>struts2</filter-name>
+  	<url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+</web-app>
+

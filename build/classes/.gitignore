@@ -1,0 +1,9 @@
+/action/
+/dao/
+/log4j.properties
+/mapping/
+/pojo/
+/service/
+/ssh.xml
+/struts.xml
+/test/
